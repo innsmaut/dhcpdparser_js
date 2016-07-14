@@ -9,13 +9,13 @@
 <input type="file" id="files" name="files[]" onchange="handleFileSelect(this.files)" multiple />
 <output id="list"></output>
 
-        <button onclick="console.log(output)">Print fie into console</button>
-        <button onclick="parserM(arrNum)">Search for matches</button>
+        <button onclick="console.log(readedLogs)">Print fie into console</button>
+        <button onclick="parseAll()">Search for matches</button>
 
 
 
 <script>
-        var readedLogs = [];
+    var readedLogs = [];
     function handleFileSelect(evt)
     {
         var files = evt;
@@ -33,30 +33,46 @@
     }
 </script>
 
-        <script>
-            var arrToMatch = [[]];
-            var arrNum = 0;
-
-            function parserM(n)
+<script>
+    function parseM(n)
+    {
+        var parseSummary = [[]];
+        strToParse = readedLogs[n];
+        parseArr = strToParse.split(/\w\w\w  \d \d\d:\d\d:\d\d amon-ra dhcpd: /);
+        for (var i = 4; i < parseArr.length; i++)
+        {
+            if (parseArr[i].slice(4, 7) == 'ACK')
             {
-                strToParse = readedLogs[n];
-                parseArr = strToParse.split(/\w\w\w  \d \d\d:\d\d:\d\d amon-ra dhcpd: /);
-                for (var i = 4; i < parseArr.length; i++)
+                clIp = parseArr[i - 1].match(/(80|188)\.\d+\.\d+\.\d+/);
+                swIp = parseArr[i - 1].match(/172\.\d+\.\d+\.\d+/);
+                swPort = parseArr[i - 4].match(/\d+/);
+                clMac = parseArr[i].match(/..:..:..:..:..:../);
+                if (clIp)
                 {
-                    if (parseArr[i].slice(4, 7) == 'ACK')
-                    {
-                        clIp = parseArr[i - 1].match(/(80|188)\.\d+\.\d+\.\d+/g);
-                        swIp = parseArr[i - 1].match(/172\.\d+\.\d+\.\d+/g);
-                        swPort = parseArr[i - 4].match(/\d+/);
-                        clMac = parseArr[i].match(/..:..:..:..:..:../);
-                        arrToMatch[n][clIp] = [swIp, swPort, clMac];
-                    }
+                    parseSummary[clIp[0]] = [swIp.toString(), swPort.toString(), clMac.toString(), clIp[0]];
                 }
-                console.log(arrToMatch);
             }
+        }
+        //console.log(parseSummary);
+        return parseSummary;
+    }
 
+    function parseAll()
+    {
+        var arrToMatch = [[]];
+        var matchedArr = [[]];
+        for (i = 0; i < readedLogs.length; i++)
+        {
+            arrToMatch = parseM(i);
+            for (key in arrToMatch)
+            {
+                //console.log(arrToMatch[key]);
+                matchedArr[key] = arrToMatch[key];
+            }
+        }
+        console.dir(matchedArr);
 
-
+    }
 
 
 
