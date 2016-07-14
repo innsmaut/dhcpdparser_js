@@ -6,16 +6,22 @@
         <title></title>
     </head>
     <body>
-<input type="file" onchange="handleFileSelect(this.files)" multiple />
-<output id="list"></output>
+        <h4>Specify log files</h4>
+        <p>
+            <input type="file" onchange="handleFileSelect(this.files)" multiple />
+        </p>
+        <p>
+            <button onclick="parseAll()">Search for matches</button>
+        </p>
+        <h4>Specify clients file</h4>
+        <p>
+            <input type="file" onchange="handleFileSelect(this.files)" />
+        </p>
+        <p>
+            <button onclick="parseClist()">Read clients base</button>
+        </p>
 
-        <button onclick="console.log(readedLogs)">Print fie into console</button>
-        <button onclick="parseAll()">Search for matches</button>
-
-<input type="file" onchange="handleFileSelect(this.files)" />
-<output id="list"></output>
-
-        <button onclick="parseClist()">Read clients base</button>
+        <p id="rawlist"></p>
 
 <script>
     var readedLogs = [];
@@ -59,10 +65,10 @@
         return parseSummary;
     }
 
+    var matchedArr = [[]];
     function parseAll()
     {
         var arrToMatch = [[]];
-        var matchedArr = [[]];
         for (i = 0; i < readedLogs.length; i++)
         {
             arrToMatch = parseM(i);
@@ -71,7 +77,7 @@
                 matchedArr[key] = arrToMatch[key];
             }
         }
-        //console.dir(matchedArr);
+        //console.log(matchedArr);
     }
 
     function parseClist()
@@ -91,21 +97,30 @@
                 clName = splittedClist[i].match(/class=s>(.*)<\/td><td valign=top><a href/);
                 clAcc = splittedClist[i].match(/td><td valign=top>(\S*)\s*</);
 
-                if (clLogin && clName && clAcc)
+                if (clLogin && clName && clAcc && matchedArr[clientIp[0]])
                 {
                     resClist[clientIp[0]] = [clLogin[1].trim(), clName[1].trim(), clAcc[1]];
+                    matchedArr[clientIp[0]].push(clLogin[1].trim(), clName[1].trim(), clAcc[1]);
+
                 }
             }
         }
-        console.log(resClist);
-        console.log(splittedClist);
-        //document.getElementById('rawlist').innerHTML = splittedClist;
+        //console.log(resClist);
+        console.log(matchedArr);
+        var listHtml = '';
+        counter = 0;
+        for (key in matchedArr)
+        {
+            listHtml += '<br>' + counter + ". IP: " + matchedArr[key][3] + "   Account: " + matchedArr[key][6] + "   Login: " + matchedArr[key][4] + "   Name: " + matchedArr[key][5] + "   MAC: " + matchedArr[key][2] + "   Switch/port: " + matchedArr[key][0] + ":" + matchedArr[key][1];
+            counter++;
+        }
+
+        document.getElementById('rawlist').innerHTML = listHtml;
     }
 
 
 
 
         </script>    
-        <p id="rawlist"></p>
     </body>
 </html>
