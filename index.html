@@ -2,17 +2,20 @@
 
 <html lang="en">
     <head>
-        <meta charset="utf-8" />
+        <meta charset="utf-8/Windows-1251" />
         <title></title>
     </head>
     <body>
-<input type="file" id="files" name="files[]" onchange="handleFileSelect(this.files)" multiple />
+<input type="file" onchange="handleFileSelect(this.files)" multiple />
 <output id="list"></output>
 
         <button onclick="console.log(readedLogs)">Print fie into console</button>
         <button onclick="parseAll()">Search for matches</button>
 
+<input type="file" onchange="handleFileSelect(this.files)" />
+<output id="list"></output>
 
+        <button onclick="parseClist()">Read clients base</button>
 
 <script>
     var readedLogs = [];
@@ -53,7 +56,6 @@
                 }
             }
         }
-        //console.log(parseSummary);
         return parseSummary;
     }
 
@@ -66,20 +68,44 @@
             arrToMatch = parseM(i);
             for (key in arrToMatch)
             {
-                //console.log(arrToMatch[key]);
                 matchedArr[key] = arrToMatch[key];
             }
         }
-        console.dir(matchedArr);
+        //console.dir(matchedArr);
+    }
 
+    function parseClist()
+    {
+        var resClist = [[]];
+        logins = 0;
+        names = 0;
+        accs = 0;
+        rawClist = readedLogs[readedLogs.length - 1];
+        splittedClist = rawClist.split(String.fromCharCode(13));
+        for (i = 0; i < splittedClist.length; i++)
+        {
+            clientIp = splittedClist[i].match(/((80.77|188.247)\.\d+\.\d+)/);
+            if (clientIp)
+            {
+                clLogin = splittedClist[i].match(/(\w+)<\/td><td valign=top>/);
+                clName = splittedClist[i].match(/class=s>(.*)<\/td><td valign=top><a href/);
+                clAcc = splittedClist[i].match(/td><td valign=top>(\S*)\s*</);
+
+                if (clLogin && clName && clAcc)
+                {
+                    resClist[clientIp[0]] = [clLogin[1].trim(), clName[1].trim(), clAcc[1]];
+                }
+            }
+        }
+        console.log(resClist);
+        console.log(splittedClist);
+        //document.getElementById('rawlist').innerHTML = splittedClist;
     }
 
 
 
 
-
-
         </script>    
-
+        <p id="rawlist"></p>
     </body>
 </html>
