@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+    </head>
+    <body>
+<input type="file" id="files" name="files[]" onchange="handleFileSelect(this.files)" multiple />
+<output id="list"></output>
+
+        <button onclick="console.log(output)">Print fie into console</button>
+        <button onclick="parserM(arrNum)">Search for matches</button>
+
+
+
+<script>
+        var readedLogs = [];
+    function handleFileSelect(evt)
+    {
+        var files = evt;
+        var reader = {};
+        for (var i = 0; i < files.length; i++)
+        {
+            var f = files[i];
+            reader[i] = new FileReader;
+            reader[i].readAsText(f);
+            reader[i].onload = function (x)
+            {
+                readedLogs.push(x.target.result);
+            }
+        }
+    }
+</script>
+
+        <script>
+            var arrToMatch = [[]];
+            var arrNum = 0;
+
+            function parserM(n)
+            {
+                strToParse = readedLogs[n];
+                parseArr = strToParse.split(/\w\w\w  \d \d\d:\d\d:\d\d amon-ra dhcpd: /);
+                for (var i = 4; i < parseArr.length; i++)
+                {
+                    if (parseArr[i].slice(4, 7) == 'ACK')
+                    {
+                        clIp = parseArr[i - 1].match(/(80|188)\.\d+\.\d+\.\d+/g);
+                        swIp = parseArr[i - 1].match(/172\.\d+\.\d+\.\d+/g);
+                        swPort = parseArr[i - 4].match(/\d+/);
+                        clMac = parseArr[i].match(/..:..:..:..:..:../);
+                        arrToMatch[n][clIp] = [swIp, swPort, clMac];
+                    }
+                }
+                console.log(arrToMatch);
+            }
+
+
+
+
+
+
+
+
+
+        </script>    
+
+    </body>
+</html>
